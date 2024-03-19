@@ -1,11 +1,16 @@
 import React, { useState } from "react";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import OAuth from "../components/OAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { VscEye } from "react-icons/vsc";
 import { VscEyeClosed } from "react-icons/vsc";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(true);
   const [formData, setFormData] = useState({});
 
@@ -23,16 +28,26 @@ const SignUp = () => {
     };
 
     try {
-      const response = await fetch("/api/user/register", {
+      const response = await fetch("/api/auth/register", {
         method: "post",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(userData),
       });
+      if (!response.ok) {
+        console.log("error recieved");
+        return;
+      }
       const data = await response.json();
       if (data.success == false) {
         console.log("error while registering user");
+        return;
       }
+
       console.log(data);
+      toast.success("User Registered Successfully.");
+      toast.done("Please Login using your email and password");
+
+      navigate("/login");
     } catch (error) {
       console.log("error while registering user ", error);
     }
@@ -137,12 +152,13 @@ const SignUp = () => {
         <div className="py-4 text-sm mb-4">
           <p>
             Already have an account?{" "}
-            <Link to="/join-us">
+            <Link to="/login">
               <span className="text-blue-500"> Login Here!</span>
             </Link>
           </p>
         </div>
       </form>
+      <ToastContainer />
     </div>
   );
 };

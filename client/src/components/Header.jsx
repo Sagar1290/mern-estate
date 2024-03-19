@@ -18,7 +18,7 @@ const Header = () => {
             About
           </Link>
           <Link
-            to="/join-us"
+            to="/login"
             className="p-2 hover:text-blue-500 font-semibold underline"
           >
             Join-us

@@ -51,7 +51,7 @@ const JoinUs = () => {
         <div className="py-4 text-sm mb-4">
           <p>
             Don&apos;t have an account?{" "}
-            <Link to="/sign-up">
+            <Link to="/register">
               <span className="text-blue-500"> Create One!</span>
             </Link>
           </p>
