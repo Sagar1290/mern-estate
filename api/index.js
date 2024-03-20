@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from 'dotenv'
-import userRouter from "./routes/user.routes.js";
+
 import authRouter from "./routes/auth.routes.js";
 dotenv.config()
 
@@ -18,6 +18,8 @@ await mongoose.connect(`${process.env.MONGO_URI}/${DB_NAME}`)
 const app = express();
 app.use(express.json());
 
+app.use('/api/auth', authRouter)
+
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
@@ -28,7 +30,12 @@ app.use((err, req, res, next) => {
     })
 })
 
-app.use('/api/auth', authRouter)
+app.get('/', (req, res) => {
+    throw new Error("BROKE!")
+})
+app.get('/learnErr', (req, res) => {
+    res.send("learning error handleing")
+})
 
 app.listen(8080, () => {
     console.log("server started at 8080")

@@ -11,7 +11,7 @@ import { VscEyeClosed } from "react-icons/vsc";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({});
 
   const handleChange = (e) => {
@@ -19,13 +19,24 @@ const SignUp = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(formData);
 
     const userData = {
       fullname: formData.firstName + " " + formData.lastName,
       email: formData.email,
       password: formData.password,
+      username: formData.username,
     };
+    if (
+      [
+        userData.fullname,
+        userData.email,
+        userData.password,
+        userData.username,
+      ].some((ele) => !ele || ele.trim() === "")
+    ) {
+      toast.error("all fields are cumpolsury");
+      return;
+    }
 
     try {
       const response = await fetch("/api/auth/register", {
@@ -33,28 +44,21 @@ const SignUp = () => {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(userData),
       });
-      if (!response.ok) {
-        console.log("error recieved");
-        return;
-      }
+
       const data = await response.json();
       if (data.success == false) {
-        console.log("error while registering user");
+        toast.error(`Error: ${data.message}`);
         return;
       }
-
-      console.log(data);
       toast.success("User Registered Successfully.");
-      toast.done("Please Login using your email and password");
-
-      navigate("/login");
     } catch (error) {
-      console.log("error while registering user ", error);
+      console.log(error);
     }
   };
 
   return (
     <div className="min-h-screen">
+      <ToastContainer />
       <form
         className="w-[90%] mx-auto max-w-lg border p-4 rounded-lg"
         onSubmit={handleSubmit}
@@ -73,6 +77,7 @@ const SignUp = () => {
               type="text"
               placeholder="Jane"
               onChange={handleChange}
+              autoComplete="off"
             />
           </div>
           <div className="w-full md:w-1/2 px-3">
@@ -88,6 +93,7 @@ const SignUp = () => {
               type="text"
               placeholder="Doe"
               onChange={handleChange}
+              autoComplete="off"
             />
           </div>
         </div>
@@ -97,11 +103,27 @@ const SignUp = () => {
               className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
               for="email"
             >
-              Email
+              Username
               <span className="text-gray-600 text-xs font-normal italic mb-2 lowercase tracking-normal">
                 {" "}
-                (This will be your future username)
+                (Remember this for future login)
               </span>
+            </label>
+            <input
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              id="username"
+              type="text"
+              placeholder="user_xyz"
+              onChange={handleChange}
+              autoComplete="off"
+            />
+          </div>
+          <div className="w-full px-3">
+            <label
+              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              for="email"
+            >
+              Email
             </label>
             <input
               className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -129,6 +151,7 @@ const SignUp = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
                 onChange={handleChange}
+                autoComplete="off"
               />
               <div
                 className="absolute top-0 text-2xl p-4 right-0 cursor-pointer"
@@ -158,7 +181,6 @@ const SignUp = () => {
           </p>
         </div>
       </form>
-      <ToastContainer />
     </div>
   );
 };

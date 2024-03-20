@@ -1,15 +1,50 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const JoinUs = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({});
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.username || !formData.password) {
+      toast.error("All Fields Required");
+      return;
+    }
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "post",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (data.success == false) {
+        toast.error(`Error: ${data.message}`);
+        return;
+      }
+      toast.success("User login successfully");
+      console.log(data);
+    } catch (error) {
+      toast.error("Error While logging in User!!");
+      console.log(error);
+    }
+  };
   return (
     <div className=" w-full min-h-screen">
-      <form className=" shadow-lg rounded w-[90%] md:max-w-md mx-auto p-4 mt-10 bg-sky-50">
+      <ToastContainer />
+      <form
+        className=" shadow-lg rounded w-[90%] md:max-w-md mx-auto p-4 mt-10 bg-sky-50"
+        onSubmit={handleSubmit}
+      >
         <div className="mb-4">
           <label
             className="block text-gray-700 text-md font-bold mb-2"
-            for="username"
+            for="email"
           >
             Username
           </label>
@@ -18,6 +53,7 @@ const JoinUs = () => {
             id="username"
             type="text"
             placeholder="Username"
+            onChange={handleChange}
           />
         </div>
         <div className="mb-6">
@@ -32,6 +68,7 @@ const JoinUs = () => {
             id="password"
             type="password"
             placeholder="******************"
+            onChange={handleChange}
           />
         </div>
         <div className="flex items-center justify-between">
