@@ -69,4 +69,49 @@ const loginUser = async (req, res, next) => {
     }
 }
 
-export { registerUser, loginUser }
+const updatePassword = async (req, res, next) => {
+
+}
+
+const loginWithGoogle = async (req, res, next) => {
+    const { email, fullname } = req.body;
+
+    try {
+        const existingUser = await User.findOne({ email })
+        if (existingUser) {
+
+            const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET)
+
+            const { password: hashedPassword, ...userData } = existingUser._doc
+
+            res.cookie('access_token', token, { expires: new Date(Date.now() + 8 * 3600000), httpOnly: true })
+            res.status(200).json({ message: "user saved successfully", userData })
+        }
+        else {
+            const createdUSer = new User({
+                fullname,
+                username: fullname.trim().replace(" ", "").slice(0, 8) + parseInt(Math.random(0, 1) * 10000).toString(),
+                password: fullname + email,
+                email
+            })
+
+            const savedUser = await createdUSer.save();
+            if (!savedUser) {
+                next(errorHandler(411, "error saving data in DB"))
+            }
+
+            const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET)
+
+            const { password: hashedPassword, ...userData } = savedUser._doc
+
+
+            res.cookie('access_token', token, { expires: new Date(Date.now() + 8 * 3600000), httpOnly: true })
+            res.status(200).json({ message: "user saved successfully", userData })
+        }
+    } catch (error) {
+        return next(errorHandler(404, "something went wrong "))
+    }
+
+}
+
+export { registerUser, loginUser, updatePassword, loginWithGoogle }

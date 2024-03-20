@@ -3,13 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { VscEye, VscEyeClosed } from "react-icons/vsc";
 
 const JoinUs = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.password) {
@@ -34,22 +38,23 @@ const JoinUs = () => {
       console.log(error);
     }
   };
+
   return (
     <div className=" w-full min-h-screen">
       <ToastContainer />
       <form
-        className=" shadow-lg rounded w-[90%] md:max-w-md mx-auto p-4 mt-10 bg-sky-50"
+        className=" w-[90%] mx-auto max-w-lg border p-4 rounded-lg"
         onSubmit={handleSubmit}
       >
         <div className="mb-4">
           <label
-            className="block text-gray-700 text-md font-bold mb-2"
+            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
             for="email"
           >
             Username
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             id="username"
             type="text"
             placeholder="Username"
@@ -58,18 +63,28 @@ const JoinUs = () => {
         </div>
         <div className="mb-6">
           <label
-            className="block text-gray-700 text-md font-bold mb-2"
+            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
             for="password"
           >
             Password
           </label>
-          <input
-            className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-            id="password"
-            type="password"
-            placeholder="******************"
-            onChange={handleChange}
-          />
+          <div className="flex flex-row relative items-center">
+            <input
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              id="password"
+              type="password"
+              placeholder="******************"
+              onChange={handleChange}
+            />
+            <div
+              className="absolute top-0 text-2xl p-4 right-0 cursor-pointer"
+              onClick={() => {
+                setShowPassword(!showPassword);
+              }}
+            >
+              {showPassword ? <VscEyeClosed /> : <VscEye />}
+            </div>
+          </div>
         </div>
         <div className="flex items-center justify-between">
           <button
