@@ -5,8 +5,17 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 
+import {
+  signInSuccess,
+  signInStart,
+  signInFailure,
+} from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 const JoinUs = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, userData, error } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
@@ -21,6 +30,7 @@ const JoinUs = () => {
       return;
     }
     try {
+      dispatch(signInStart());
       const response = await fetch("/api/auth/login", {
         method: "post",
         headers: { "content-type": "application/json" },
@@ -28,13 +38,16 @@ const JoinUs = () => {
       });
       const data = await response.json();
       if (data.success == false) {
-        toast.error(`Error: ${data.message}`);
+        alert(`Error: ${data.message}`);
+        dispatch(signInFailure());
         return;
       }
-      toast.success("User login successfully");
-      console.log(data);
+      alert("User login successfully");
+      dispatch(signInSuccess(data.userData));
+      console.log(data.userData);
     } catch (error) {
-      toast.error("Error While logging in User!!");
+      alert("Error While logging in User!!");
+      dispatch(signInFailure());
       console.log(error);
     }
   };
@@ -49,7 +62,7 @@ const JoinUs = () => {
         <div className="mb-4">
           <label
             className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            for="email"
+            htmlFor="email"
           >
             Username
           </label>
@@ -59,12 +72,13 @@ const JoinUs = () => {
             type="text"
             placeholder="Username"
             onChange={handleChange}
+            autoComplete="off"
           />
         </div>
         <div className="mb-6">
           <label
             className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            for="password"
+            htmlFor="password"
           >
             Password
           </label>
@@ -72,9 +86,10 @@ const JoinUs = () => {
             <input
               className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="******************"
               onChange={handleChange}
+              autoComplete="off"
             />
             <div
               className="absolute top-0 text-2xl p-4 right-0 cursor-pointer"
@@ -88,13 +103,13 @@ const JoinUs = () => {
         </div>
         <div className="flex items-center justify-between">
           <button
-            className="w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:shadow-outline"
             type="submit"
           >
-            Sign In
+            {loading ? "Loading..." : "Register now!"}
           </button>
           <a
-            className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+            className="p-2 rounded-sm inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 focus:outline focus:outline-1"
             href="#"
           >
             Forgot Password?
@@ -104,12 +119,18 @@ const JoinUs = () => {
           <p>
             Don&apos;t have an account?{" "}
             <Link to="/register">
-              <span className="text-blue-500"> Create One!</span>
+              <span className="text-blue-500 hover:text-blue-800 font-semibold">
+                {" "}
+                Create One!
+              </span>
             </Link>
           </p>
         </div>
         <OAuth />
       </form>
+      <div className="w-[90%] mx-auto max-w-lg p-4 text-red-800">
+        {error ? error : ""}
+      </div>
     </div>
   );
 };

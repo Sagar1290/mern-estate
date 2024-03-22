@@ -85,7 +85,7 @@ const loginWithGoogle = async (req, res, next) => {
             const { password: hashedPassword, ...userData } = existingUser._doc
 
             res.cookie('access_token', token, { expires: new Date(Date.now() + 8 * 3600000), httpOnly: true })
-            res.status(200).json({ message: "user saved successfully", userData })
+            res.status(200).json({ message: "User Login successfully", userData })
         }
         else {
             const createdUSer = new User({
@@ -104,9 +104,8 @@ const loginWithGoogle = async (req, res, next) => {
 
             const { password: hashedPassword, ...userData } = savedUser._doc
 
-
             res.cookie('access_token', token, { expires: new Date(Date.now() + 8 * 3600000), httpOnly: true })
-            res.status(200).json({ message: "user saved successfully", userData })
+            res.status(200).json({ message: "User saved successfully", userData })
         }
     } catch (error) {
         return next(errorHandler(404, "something went wrong "))

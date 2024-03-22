@@ -9,8 +9,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { VscEye } from "react-icons/vsc";
 import { VscEyeClosed } from "react-icons/vsc";
 
+import {
+  signInSuccess,
+  signInStart,
+  signInFailure,
+} from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 const SignUp = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { loading, userData, error } = useSelector((state) => state.user);
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({});
 
@@ -40,6 +51,7 @@ const SignUp = () => {
     }
 
     try {
+      dispatch(signInStart());
       const response = await fetch("/api/auth/register", {
         method: "post",
         headers: { "content-type": "application/json" },
@@ -48,12 +60,17 @@ const SignUp = () => {
 
       const data = await response.json();
       if (data.success == false) {
-        toast.error(`Error: ${data.message}`);
+        // toast.error(`Error: ${data.message}`);
+        alert(`Error: ${data.message}`);
+        dispatch(signInFailure(data.message));
         return;
       }
-      toast.success("User Registered Successfully.");
+      // toast.success("User Registered Successfully.");
+      alert("User Registered Successfully");
+      dispatch(signInSuccess(data.userData));
     } catch (error) {
       console.log(error);
+      dispatch(signInFailure(error));
     }
   };
 
@@ -68,7 +85,7 @@ const SignUp = () => {
           <div className="w-full md:w-1/2 px-3 md:mb-0">
             <label
               className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              for="firstName"
+              htmlFor="firstName"
             >
               First Name
             </label>
@@ -84,7 +101,7 @@ const SignUp = () => {
           <div className="w-full md:w-1/2 px-3">
             <label
               className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              for="lastName"
+              htmlFor="lastName"
             >
               Last Name
             </label>
@@ -102,7 +119,7 @@ const SignUp = () => {
           <div className="w-full px-3">
             <label
               className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              for="email"
+              htmlFor="email"
             >
               Username
               <span className="text-gray-600 text-xs font-normal italic mb-2 lowercase tracking-normal">
@@ -122,7 +139,7 @@ const SignUp = () => {
           <div className="w-full px-3">
             <label
               className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              for="email"
+              htmlFor="email"
             >
               Email
             </label>
@@ -137,7 +154,7 @@ const SignUp = () => {
           <div className="w-full px-3">
             <label
               className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              for="password"
+              htmlFor="password"
             >
               Password
               <span className="text-gray-600 text-xs font-normal italic mb-2 lowercase tracking-normal">
@@ -167,21 +184,27 @@ const SignUp = () => {
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white text-md sm:text-lg font-semibold px-4 py-3 rounded-md w-full mb-3"
+          className="bg-blue-500 hover:bg-blue-700 text-white text-md sm:text-lg font-semibold px-4 py-3 rounded-md w-full mb-3"
           onSubmit={handleSubmit}
         >
-          Register Now!
+          {loading ? "Loading..." : "Register now!"}
         </button>
         <OAuth />
         <div className="py-4 text-sm mb-4">
           <p>
             Already have an account?{" "}
             <Link to="/login">
-              <span className="text-blue-500"> Login Here!</span>
+              <span className="text-blue-500 hover:text-blue-800 font-semibold">
+                {" "}
+                Login Here!
+              </span>
             </Link>
           </p>
         </div>
       </form>
+      <div className="w-[90%] mx-auto max-w-lg p-4 text-red-800">
+        {error ? error : ""}
+      </div>
     </div>
   );
 };

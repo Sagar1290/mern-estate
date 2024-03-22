@@ -4,7 +4,19 @@ import { app } from "../../firebase.config";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { ToastContainer, toast } from "react-toastify";
 
+import {
+  signInSuccess,
+  signInStart,
+  signInFailure,
+} from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 const OAuth = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { loading, userData, error } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
 
   const handleGoogleLogin = async (e) => {
@@ -24,16 +36,20 @@ const OAuth = () => {
       });
 
       const data = await response.json();
-      console.log(data);
+
       if (data.success === false) {
-        toast.error(`ERROR: ${data.message}`);
+        alert(`ERROR: ${data.message}`);
+        dispatch(signInFailure(data.message));
         return;
       }
 
-      toast.success("User Login Successfull");
+      alert("User Login Successfull");
+      dispatch(signInSuccess(data.userData));
+      // console.log(data);
     } catch (error) {
       console.log(error);
-      toast.error(`ERROR: ${error.message}`);
+      dispatch(signInFailure(error));
+      alert(`ERROR: ${error.message}`);
     }
   };
 
@@ -45,7 +61,6 @@ const OAuth = () => {
         onClick={handleGoogleLogin}
         type="button"
       >
-        {" "}
         Continue with google
       </button>
     </>
