@@ -1,7 +1,10 @@
 import { CiSearch } from "react-icons/ci";
 import { Link } from "react-router-dom";
+import { FaCircleUser } from "react-icons/fa6";
+import { useSelector } from "react-redux";
 
 const Header = () => {
+  const { userData } = useSelector((state) => state.user);
   return (
     <header className="border-b pb-4 md:pb-0 pt-4 bg-gray-100 mb-2 md:mb-4 transition-all">
       <div className="flex flex-row justify-between items-center sm:px-4 w-[90%] sm:w-full mx-auto">
@@ -17,11 +20,12 @@ const Header = () => {
           >
             About
           </Link>
+
           <Link
-            to="/login"
-            className="p-2 hover:text-blue-500 font-semibold underline"
+            to="/profile"
+            className="p-2 hover:text-blue-500 font-semibold underline flex items-center justify-center"
           >
-            Join-us
+            {userData ? <FaCircleUser className="text-2xl" /> : "Join - us"}
           </Link>
         </div>
       </div>
